@@ -2,17 +2,17 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Recipe, User } from '../types';
-import { v4 as uuidv4 } from 'uuid';  // import uuidv4
+import { v4 as uuidv4 } from 'uuid';
 
 interface RecipeContextType {
   user: User | null;
   login: (username: string) => void;
+  signup: (username: string) => void;
   logout: () => void;
   recipes: Recipe[];
   addRecipe: (recipe: Recipe) => void;
 }
 
-// Initialize context with undefined to force provider usage
 const RecipeContext = createContext<RecipeContextType | undefined>(undefined);
 
 export const RecipeProvider = ({ children }: { children: ReactNode }) => {
@@ -41,30 +41,52 @@ export const RecipeProvider = ({ children }: { children: ReactNode }) => {
     },
   ]);
 
+  // Login existing user
   const login = (username: string) => {
+    const existingUser: User = {
+      id: uuidv4(),
+      username,
+    };
+    setUser(existingUser);
+  };
+
+  // Signup new user
+  const signup = (username: string) => {
     const newUser: User = {
-      id: uuidv4(),    // generate unique id here
+      id: uuidv4(),
       username,
     };
     setUser(newUser);
   };
 
+  // Logout user
   const logout = () => {
     setUser(null);
   };
 
+  // Add a recipe and associate with current user
   const addRecipe = (recipe: Recipe) => {
-    setRecipes((prev) => [...prev, recipe]);
+    if (!user) return; // only logged-in users can upload
+
+    const newRecipe: Recipe = {
+      ...recipe,
+      id: uuidv4(),
+      author: user.username,
+    };
+
+    setRecipes((prev) => [...prev, newRecipe]);
   };
 
   return (
-    <RecipeContext.Provider value={{ user, login, logout, recipes, addRecipe }}>
+    <RecipeContext.Provider
+      value={{ user, login, signup, logout, recipes, addRecipe }}
+    >
       {children}
     </RecipeContext.Provider>
   );
 };
 
-// Custom hook with safety check
+// Custom hook for consuming context
 export const useRecipeContext = () => {
   const context = useContext(RecipeContext);
   if (!context) {

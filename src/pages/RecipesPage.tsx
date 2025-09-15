@@ -3,6 +3,10 @@ import Filter from '../components/Filter';
 import RecipeCard from '../components/RecipeCard';
 import { Recipe } from '../types';
 
+interface RecipesPageProps {
+  recipes: Recipe[];
+}
+
 const categories = [
   'Italian',
   'Indian',
@@ -14,15 +18,9 @@ const categories = [
   'Desserts',
 ];
 
-interface RecipesPageProps {
-  recipes: Recipe[];
-}
-
 const RecipesPage: React.FC<RecipesPageProps> = ({ recipes }) => {
-  // State to track selected category filter
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
-  // Filter recipes by category if selected
   const filteredRecipes = selectedCategory
     ? recipes.filter(
         (r) => r.category?.toLowerCase() === selectedCategory.toLowerCase()
@@ -38,14 +36,12 @@ const RecipesPage: React.FC<RecipesPageProps> = ({ recipes }) => {
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       }}
     >
-      {/* Category Filter dropdown */}
       <Filter
         categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
       />
 
-      {/* Recipe Cards Grid */}
       <section
         style={{
           marginTop: '2rem',
