@@ -86,18 +86,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             </strong>{' '}
             {recipe.category || 'N/A'}
           </p>
-          <p>
-            <strong style={{ fontWeight: 600, color: '#7d5a50' }}>
-              Ingredients:
-            </strong>{' '}
-            {recipe.ingredients?.length
-              ? recipe.ingredients.join(', ')
-              : 'N/A'}
-          </p>
+          {/* Ingredients removed to keep them hidden on card */}
         </div>
       </div>
     </Link>
   );
 };
 
-export default RecipeCard;
+export default RecipeCard;  
