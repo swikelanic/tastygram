@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Filter from '../components/Filter';
 import RecipeCard from '../components/RecipeCard';
 import { Recipe } from '../types';
 
 interface RecipesPageProps {
   recipes: Recipe[];
+  searchQuery?: string; // receive search query from App
 }
 
 const categories = [
@@ -18,14 +19,28 @@ const categories = [
   'Desserts',
 ];
 
-const RecipesPage: React.FC<RecipesPageProps> = ({ recipes }) => {
+const RecipesPage: React.FC<RecipesPageProps> = ({ recipes, searchQuery = '' }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>(recipes);
 
-  const filteredRecipes = selectedCategory
-    ? recipes.filter(
+  // ✅ Update filtered recipes whenever search or category changes
+  useEffect(() => {
+    let updated = recipes;
+
+    if (selectedCategory) {
+      updated = updated.filter(
         (r) => r.category?.toLowerCase() === selectedCategory.toLowerCase()
-      )
-    : recipes;
+      );
+    }
+
+    if (searchQuery) {
+      updated = updated.filter((r) =>
+        r.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredRecipes(updated);
+  }, [selectedCategory, searchQuery, recipes]);
 
   return (
     <main
@@ -65,7 +80,7 @@ const RecipesPage: React.FC<RecipesPageProps> = ({ recipes }) => {
               marginTop: '3rem',
             }}
           >
-            No recipes found for "{selectedCategory}".
+            No recipes found.
           </p>
         )}
       </section>

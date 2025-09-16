@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import WelcomePage from './pages/WelcomePage';
 import RecipesPage from './pages/RecipesPage';
 import RecipeDetailPage from './pages/RecipeDetailPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import GuestPage from './pages/GuestPage';
 import { Recipe } from './types';
 
 // Import all images with exact filenames
@@ -35,9 +39,7 @@ import crepes from './assets/crepes.jpeg';
 import pecanpie from './assets/pecanpie.jpeg';
 import raspberrycheesecake from './assets/raspberrycheesecake.jpeg';
 
-// Sample recipes array
 const sampleRecipes: Recipe[] = [
-  // Main meals
   {
     id: '1',
     title: 'Spaghetti Carbonara',
@@ -138,7 +140,6 @@ const sampleRecipes: Recipe[] = [
     steps: 'Mix ingredients. Bake. Serve with cream or custard.',
     author: 'Chef Marco',
   },
-
   {
     id: '14',
     title: 'Chocolate Brownies',
@@ -302,12 +303,31 @@ const sampleRecipes: Recipe[] = [
 ];
 
 const App: React.FC = () => {
+
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
     <Router>
+      {/* Pass search setter to Navbar */}
+      <Navbar onSearch={setSearchQuery} />
+
       <Routes>
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/recipes" element={<RecipesPage recipes={sampleRecipes} />} />
-        <Route path="/recipes/:id" element={<RecipeDetailPage recipes={sampleRecipes} />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/guest" element={<GuestPage />} />
+
+        {/* Pass searchQuery to RecipesPage */}
+        <Route
+          path="/recipes"
+          element={<RecipesPage recipes={sampleRecipes} searchQuery={searchQuery} />}
+        />
+
+        <Route
+          path="/recipes/:id"
+          element={<RecipeDetailPage recipes={sampleRecipes} />}
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

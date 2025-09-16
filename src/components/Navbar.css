@@ -1,0 +1,57 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff; /* white background for elegance */
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: #bfa34a; /* soft gold for text */
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar-logo a {
+  color: #bfa34a; /* gold logo */
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navbar-links li a {
+  color: #333333; /* darker text for readability */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navbar-links li a:hover {
+  color: #bfa34a; /* gold on hover */
+}
+
+.navbar-search input {
+  padding: 0.4rem 0.6rem;
+  border-radius: 5px;
+  border: 1px solid #bfa34a; /* subtle gold border */
+  outline: none;
+  color: #333333;
+}
+
+.navbar-search button {
+  padding: 0.4rem 0.8rem;
+  margin-left: 0.5rem;
+  border: none;
+  background-color: #bfa34a; /* gold button */
+  color: #ffffff; /* white text inside button */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.navbar-search button:hover {
+  background-color: #d4b65a; /* slightly lighter gold on hover */
+}
