@@ -7,7 +7,7 @@ import { Recipe } from './types';
 
 // Import all images with exact filenames
 import carbonara from './assets/carbonara.jpg';
-import butterChicken from './assets/foods.jpg';
+import butterChicken from './assets/Butter-Chicken.jpg';
 import foods from './assets/foods.jpg';
 import sam from './assets/sam.jpg';
 import tacos from './assets/ttacos.jpg';
