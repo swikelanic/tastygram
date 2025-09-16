@@ -1,6 +1,7 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Recipe } from '../types';
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import { Recipe } from "../types";
+import './RecipeDetailPage.css';
 
 interface RecipeDetailPageProps {
   recipes: Recipe[];
@@ -10,59 +11,87 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
   const { id } = useParams<{ id: string }>();
   const recipe = recipes.find((r) => r.id === id);
 
-  if (!recipe)
-    return (
-      <p className="text-red-600 text-center mt-6">Recipe not found</p>
-    );
+  // Debugging
+  console.log("RecipeDetailPage component rendered");
+  console.log("Route param id:", id);
+  console.log("Loaded recipe:", recipe?.title);
 
-  // Split steps by newline for numbered display
-  const stepList = recipe.steps.split('\n').filter((s) => s.trim() !== '');
+  if (!recipe) {
+    return <p className="recipe-not-found">Recipe not found</p>;
+  }
 
-  // Calculate hours and minutes from cookingTime (in minutes)
+  const stepList = recipe.steps?.split(/\.|\n/).map((s) => s.trim()).filter((s) => s.length > 0) ?? [];
   const hours = recipe.cookingTime ? Math.floor(recipe.cookingTime / 60) : 0;
   const minutes = recipe.cookingTime ? recipe.cookingTime % 60 : 0;
 
   return (
-    <div className="max-w-3xl mx-auto bg-yellow-100 p-6 rounded shadow mt-6">
-      <h1 className="text-3xl font-bold text-yellow-900 mb-4">{recipe.title}</h1>
+    <main className="recipe-page">
+      {/* Hero Section */}
+      <div className="recipe-hero">
+        {recipe.imageUrl ? (
+          <img src={recipe.imageUrl} alt={recipe.title} />
+        ) : (
+          <div className="recipe-hero-noimage">No image available</div>
+        )}
+        <div className="recipe-hero-overlay">
+          <h1>{recipe.title}</h1>
+          <p>{recipe.category || "Uncategorized"}</p>
+        </div>
+      </div>
 
-      {recipe.imageUrl && (
-        <img
-          src={recipe.imageUrl}
-          alt={recipe.title}
-          className="w-full rounded mb-4"
-        />
-      )}
+      {/* Info Card */}
+      <div className="recipe-info">
+        <div>
+          <p>Uploaded by</p>
+          <p>{recipe.author || "Anonymous"}</p>
+        </div>
+        {recipe.cookingTime && (
+          <div>
+            <p>Cooking Time</p>
+            <p>{hours > 0 ? `${hours}h ` : ""}{minutes} min</p>
+          </div>
+        )}
+        <div>
+          <p>Category</p>
+          <p>{recipe.category || "Uncategorized"}</p>
+        </div>
+      </div>
 
-      {recipe.description && <p className="mb-4 text-yellow-800">{recipe.description}</p>}
+      {/* Description */}
+      {recipe.description && <p className="recipe-description">{recipe.description}</p>}
 
-      <p className="text-sm text-yellow-700 mb-2">Category: {recipe.category}</p>
-      <p className="text-sm text-yellow-700 mb-4">Uploaded by: {recipe.author}</p>
+      {/* Ingredients & Steps */}
+      <div className="recipe-grid">
+        <div className="divider-horizontal"></div>
+        <div className="divider-vertical"></div>
 
-      {recipe.cookingTime && (
-        <p className="font-semibold mb-4">
-          Total Cooking Time: {hours > 0 ? `${hours}h ` : ''}{minutes}min
-        </p>
-      )}
+        {/* Ingredients */}
+        <section className="recipe-section">
+          <h2>Ingredients</h2>
+          {recipe.ingredients.length > 0 ? (
+            <ul>{recipe.ingredients.map((ing, idx) => <li key={idx}>{ing}</li>)}</ul>
+          ) : (
+            <p>No ingredients listed.</p>
+          )}
+        </section>
 
-      <h3 className="text-xl font-semibold mb-2">Ingredients:</h3>
-      <ul className="list-disc list-inside mb-4">
-        {recipe.ingredients.map((ing, idx) => (
-          <li key={idx}>{ing}</li>
-        ))}
-      </ul>
+        {/* Steps */}
+        <section className="recipe-section">
+          <h2>Steps</h2>
+          {stepList.length > 0 ? (
+            <ol>{stepList.map((step, idx) => <li key={idx}>{step}.</li>)}</ol>
+          ) : (
+            <p>No steps provided.</p>
+          )}
+        </section>
+      </div>
 
-      <h3 className="text-xl font-semibold mb-2">Steps:</h3>
-      <ol className="list-decimal list-inside mb-4">
-        {stepList.map((step, idx) => (
-          <li key={idx}>{step}</li>
-        ))}
-      </ol>
-
-      <Link to="/recipes" className="underline text-yellow-800 mt-6 block">
-        Back to Recipes
-      </Link>
-    </div>
+      {/* Actions */}
+      <div className="recipe-actions">
+        <Link to="/recipes">← Back to Recipes</Link>
+        <button onClick={() => window.print()}>🖨️ Print Recipe</button>
+      </div>
+    </main>
   );
 };
 
