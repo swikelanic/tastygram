@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Recipe } from '../types';
 
@@ -7,7 +7,25 @@ interface RecipeCardProps {
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
-  const [hovered, setHovered] = React.useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [liked, setLiked] = useState(false);
+
+  // Load like state from localStorage
+  useEffect(() => {
+    const savedLikes = JSON.parse(localStorage.getItem('likedRecipes') || '{}');
+    setLiked(!!savedLikes[recipe.id]);
+  }, [recipe.id]);
+
+  const toggleLike = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setLiked((prev) => {
+      const newState = !prev;
+      const savedLikes = JSON.parse(localStorage.getItem('likedRecipes') || '{}');
+      savedLikes[recipe.id] = newState;
+      localStorage.setItem('likedRecipes', JSON.stringify(savedLikes));
+      return newState;
+    });
+  };
 
   return (
     <Link
@@ -35,7 +53,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
           color: '#333',
         }}
-        aria-label={`Recipe card for ${recipe.title}`}
       >
         {/* Title */}
         <h3
@@ -44,8 +61,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             fontWeight: 700,
             fontSize: '1.6rem',
             color: '#5a3e36',
-            letterSpacing: '0.02em',
-            lineHeight: 1.2,
           }}
         >
           {recipe.title}
@@ -74,7 +89,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           style={{
             fontSize: '0.9rem',
             color: '#6b5b54',
-            lineHeight: 1.4,
             display: 'flex',
             flexDirection: 'column',
             gap: '0.3rem',
@@ -86,11 +100,25 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             </strong>{' '}
             {recipe.category || 'N/A'}
           </p>
-          {/* Ingredients removed to keep them hidden on card */}
         </div>
+
+        {/* Heart Button below */}
+        <button
+          onClick={toggleLike}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '1.5rem',
+            alignSelf: 'flex-start',
+          }}
+          aria-label={liked ? 'Unlike recipe' : 'Like recipe'}
+        >
+          {liked ? '❤️' : '🤍'}
+        </button>
       </div>
     </Link>
   );
 };
 
-export default RecipeCard;  
+export default RecipeCard;
