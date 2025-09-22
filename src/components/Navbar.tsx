@@ -7,9 +7,11 @@ interface NavbarProps {
   onSearch: React.Dispatch<React.SetStateAction<string>>;
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  darkMode?: boolean; // optional prop
+  setDarkMode?: React.Dispatch<React.SetStateAction<boolean>>; // optional toggle
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser }) => {
+const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser, darkMode = false, setDarkMode }) => {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser }) => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${darkMode ? 'dark-mode' : ''}`}>
       {/* Logo */}
       <div className="navbar-logo">
         <a onClick={() => navigate('/')}>TastyGram</a>
@@ -40,6 +42,13 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser }) => {
         />
       </div>
 
+      {/* Dark mode toggle */}
+      {setDarkMode && (
+        <button className="dark-mode-toggle" onClick={() => setDarkMode(!darkMode)}>
+          {darkMode ? '☀️ Light' : '🌙 Dark'}
+        </button>
+      )}
+
       {/* Menu links */}
       <ul className="navbar-links">
         <li>
@@ -52,7 +61,6 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser }) => {
               <Link to="/upload">Upload</Link>
             </li>
             <li>
-              {/* NEW: My Recipes Link */}
               <Link to="/my-recipes">My Recipes</Link>
             </li>
             <li>

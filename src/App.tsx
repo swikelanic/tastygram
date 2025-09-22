@@ -40,8 +40,7 @@ import crepes from './assets/crepes.jpeg'
 import pecanpie from './assets/pecanpie.jpeg'
 import raspberrycheesecake from './assets/raspberrycheesecake.jpeg'
 
-// Sample recipes array
-const sampleRecipes: Recipe[] = [
+const recipes: Recipe[] = [
   {
     id: '1',
     title: 'Spaghetti Carbonara',
@@ -306,41 +305,44 @@ const sampleRecipes: Recipe[] = [
 ]
 
 const App: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [user, setUser] = useState<User | null>(null)
-  const [recipes, setRecipes] = useState<Recipe[]>(sampleRecipes)
-
-  // Load uploaded recipes from localStorage and merge with sampleRecipes
-  useEffect(() => {
-    const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]')
-    setRecipes([...sampleRecipes, ...savedRecipes])
-  }, [])
+  const [user, setUser] = useState<User | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
 
   return (
     <Router>
-      <Navbar onSearch={setSearchQuery} user={user} setUser={setUser} />
+      <Navbar
+        onSearch={setSearchQuery}
+        user={user}
+        setUser={setUser}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
       <Routes>
-        <Route path="/" element={<WelcomePage />} />
-        <Route path="/login" element={<LoginPage setUser={setUser} />} />
-        <Route path="/signup" element={<SignupPage setUser={setUser} />} />
-        <Route path="/guest" element={<GuestPage setUser={setUser} />} />
-
-        {/* Upload page only accessible if logged in */}
-        <Route path="/upload" element={user ? <UploadPage user={user} /> : <Navigate to="/login" />} />
-
-        {/* My Uploaded Recipes */}
-        <Route path="/my-recipes" element={user ? <MyRecipesPage user={user} /> : <Navigate to="/login" />} />
-
-        {/* All Recipes */}
-        <Route path="/recipes" element={<RecipesPage recipes={recipes} searchQuery={searchQuery} />} />
-        <Route path="/recipes/:id" element={<RecipeDetailPage recipes={recipes} />} />
-
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<WelcomePage darkMode={darkMode} />} />
+        <Route path="/login" element={<LoginPage setUser={setUser} darkMode={darkMode} />} />
+        <Route path="/signup" element={<SignupPage setUser={setUser} darkMode={darkMode} />} />
+        <Route path="/guest" element={<GuestPage setUser={setUser} darkMode={darkMode} />} />
+        <Route
+          path="/recipes"
+          element={<RecipesPage recipes={recipes} searchQuery={searchQuery} darkMode={darkMode} />}
+        />
+        <Route
+          path="/recipe/:id"
+          element={<RecipeDetailPage recipes={recipes} darkMode={darkMode} />}
+        />
+        <Route
+          path="/upload"
+          element={<UploadPage user={user} darkMode={darkMode} />}
+        />
+        <Route
+          path="/my-recipes"
+          element={<MyRecipesPage user={user} darkMode={darkMode} />}
+        />
       </Routes>
     </Router>
-  )
-}
+  );
+};
 
-export default App
+export default App;

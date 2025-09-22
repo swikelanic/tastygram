@@ -4,9 +4,10 @@ import { Recipe, Review } from '../types';
 
 interface RecipeCardProps {
   recipe: Recipe;
+  darkMode?: boolean;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, darkMode = false }) => {
   const [hovered, setHovered] = useState(false);
   const [liked, setLiked] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -31,23 +32,29 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   // Compute average rating
   const averageRating =
     recipe.reviews && recipe.reviews.length > 0
-      ? (
-          recipe.reviews.reduce((sum, r) => sum + r.rating, 0) /
-          recipe.reviews.length
-        ).toFixed(1)
+      ? (recipe.reviews.reduce((sum, r) => sum + r.rating, 0) / recipe.reviews.length).toFixed(1)
       : null;
 
   return (
-    <Link to={`/recipes/${recipe.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link
+      to={`/recipe/${recipe.id}`} // <-- fixed route
+      state={{ recipe }} // optional: pass recipe in state
+      style={{ textDecoration: 'none', color: 'inherit' }}
+    >
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         style={{
           maxWidth: 360,
-          backgroundColor: '#fefefe',
+          backgroundColor: darkMode ? '#2d2d2d' : '#fefefe',
+          color: darkMode ? '#f0f0f0' : '#333',
           borderRadius: 16,
           boxShadow: hovered
-            ? '0 12px 25px rgba(0, 0, 0, 0.12)'
+            ? darkMode
+              ? '0 12px 25px rgba(0, 0, 0, 0.5)'
+              : '0 12px 25px rgba(0, 0, 0, 0.12)'
+            : darkMode
+            ? '0 4px 12px rgba(0,0,0,0.4)'
             : '0 4px 12px rgba(0, 0, 0, 0.08)',
           margin: '1.25rem',
           padding: '1.5rem',
@@ -58,15 +65,12 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           flexDirection: 'column',
           gap: '1rem',
           fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          color: '#333',
         }}
       >
-        {/* Title */}
-        <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.6rem', color: '#5a3e36' }}>
+        <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.6rem', color: darkMode ? '#f0c6a0' : '#5a3e36' }}>
           {recipe.title}
         </h3>
 
-        {/* Recipe Image */}
         {recipe.imageUrl && (
           <img
             src={recipe.imageUrl}
@@ -75,8 +79,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
               width: '100%',
               borderRadius: 14,
               objectFit: 'cover',
-              border: '2px solid #e6d8d1',
-              boxShadow: '0 4px 12px rgba(230, 216, 209, 0.5)',
+              border: `2px solid ${darkMode ? '#555' : '#e6d8d1'}`,
+              boxShadow: darkMode ? '0 4px 12px rgba(0,0,0,0.6)' : '0 4px 12px rgba(230, 216, 209, 0.5)',
               aspectRatio: '4 / 3',
             }}
             loading="lazy"
@@ -84,15 +88,13 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           />
         )}
 
-        {/* Recipe Info */}
-        <div style={{ fontSize: '0.9rem', color: '#6b5b54', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+        <div style={{ fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
           <p>
-            <strong style={{ fontWeight: 600, color: '#7d5a50' }}>Category:</strong>{' '}
+            <strong style={{ fontWeight: 600, color: darkMode ? '#f0c6a0' : '#7d5a50' }}>Category:</strong>{' '}
             {recipe.category || 'N/A'}
           </p>
         </div>
 
-        {/* Heart button */}
         <button
           onClick={toggleLike}
           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', alignSelf: 'flex-start' }}
@@ -101,10 +103,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           {liked ? '❤️' : '🤍'}
         </button>
 
-        {/* Review Section */}
         {averageRating && (
-          <div style={{ marginTop: '0.5rem', borderTop: '1px solid #ddd', paddingTop: '0.5rem' }}>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: '#444' }}>
+          <div style={{ marginTop: '0.5rem', borderTop: `1px solid ${darkMode ? '#555' : '#ddd'}`, paddingTop: '0.5rem' }}>
+            <p style={{ margin: 0, fontSize: '0.9rem' }}>
               ⭐ {averageRating} ({recipe.reviews?.length} reviews)
             </p>
             <button
@@ -114,24 +115,38 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
               }}
               style={{
                 marginTop: '0.3rem',
-                background: '#f5f5f5',
+                background: darkMode ? '#444' : '#f5f5f5',
                 border: 'none',
                 padding: '0.3rem 0.6rem',
                 borderRadius: 6,
                 cursor: 'pointer',
                 fontSize: '0.8rem',
+                color: darkMode ? '#f0f0f0' : '#000',
               }}
             >
               {showReviews ? 'Hide Reviews' : 'Show Reviews'}
             </button>
 
             {showReviews && recipe.reviews && (
-              <div style={{ marginTop: '0.5rem', maxHeight: '150px', overflowY: 'auto', padding: '0.3rem', background: '#fafafa', borderRadius: 6 }}>
+              <div
+                style={{
+                  marginTop: '0.5rem',
+                  maxHeight: '150px',
+                  overflowY: 'auto',
+                  padding: '0.3rem',
+                  background: darkMode ? '#3a3a3a' : '#fafafa',
+                  borderRadius: 6,
+                }}
+              >
                 {recipe.reviews.map((r: Review, idx) => (
-                  <div key={idx} style={{ marginBottom: '0.5rem', borderBottom: '1px solid #eee', paddingBottom: '0.3rem' }}>
-                    <p style={{ margin: 0, fontWeight: 600, fontSize: '0.85rem', color: '#5a3e36' }}>{r.username}</p>
+                  <div key={idx} style={{ marginBottom: '0.5rem', borderBottom: `1px solid ${darkMode ? '#555' : '#eee'}`, paddingBottom: '0.3rem' }}>
+                    <p style={{ margin: 0, fontWeight: 600, fontSize: '0.85rem', color: darkMode ? '#f0c6a0' : '#5a3e36' }}>
+                      {r.username}
+                    </p>
                     <p style={{ margin: 0, fontSize: '0.8rem' }}>⭐ {r.rating}</p>
-                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#555' }}>{r.comment}</p>
+                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: darkMode ? '#ddd' : '#555' }}>
+                      {r.comment}
+                    </p>
                   </div>
                 ))}
               </div>

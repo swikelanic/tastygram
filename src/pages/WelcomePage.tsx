@@ -7,12 +7,16 @@ import food3 from '../assets/odos.jpeg';
 import food4 from '../assets/oods.jpg';
 import food5 from '../assets/sam.jpg';
 
-
 import './WelcomePage.css';
 
 const images = [food1, food2, food3, food4, food5];
 
-const WelcomePage: React.FC = () => {
+// ✅ Add props interface
+interface WelcomePageProps {
+  darkMode: boolean;
+}
+
+const WelcomePage: React.FC<WelcomePageProps> = ({ darkMode }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
 
@@ -24,7 +28,8 @@ const WelcomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="welcome-container">
+    // ✅ Use darkMode to optionally add a class
+    <div className={`welcome-container ${darkMode ? 'dark' : ''}`}>
       {images.map((img, i) => (
         <div
           key={i}

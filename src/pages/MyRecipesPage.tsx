@@ -4,39 +4,47 @@ import { Link, useNavigate } from 'react-router-dom';
 import './MyRecipesPage.css';
 
 interface MyRecipesPageProps {
-  user: User;
+  user?: User | null;       // allow null/undefined
+  darkMode?: boolean;       // optional dark mode prop
 }
 
-const MyRecipesPage: React.FC<MyRecipesPageProps> = ({ user }) => {
+const MyRecipesPage: React.FC<MyRecipesPageProps> = ({ user, darkMode = false }) => {
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) return; // safety check
     const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
     const userRecipes = savedRecipes.filter(r => r.author === user.username);
     setMyRecipes(userRecipes);
-  }, [user.username]);
+  }, [user]);
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Are you sure you want to delete this recipe?')) return;
 
-    // Remove from localStorage
     const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
     const updatedRecipes = savedRecipes.filter(r => r.id !== id);
     localStorage.setItem('uploaded_recipes', JSON.stringify(updatedRecipes));
 
-    // Update state
     setMyRecipes(myRecipes.filter(r => r.id !== id));
   };
 
   const handleEdit = (recipe: Recipe) => {
-    // Navigate to UploadPage with recipe info in state for editing
-    navigate('/upload', { state: { recipeToEdit: recipe } });
+    // Send the recipe in state as 'recipe' to match UploadPage expectation
+    navigate('/upload', { state: { recipe } });
   };
 
+  if (!user) {
+    return (
+      <main className={`my-recipes-page ${darkMode ? 'dark-mode' : ''}`}>
+        <p>Please <Link to="/login">log in</Link> to view your recipes.</p>
+      </main>
+    );
+  }
+
   return (
-    <main className="my-recipes-page">
-      <h1 className="my-recipes-title">My Uploaded Recipes</h1>
+    <main className={`my-recipes-page ${darkMode ? 'dark-mode' : ''}`}>
+      <h1 className="my-recipes-title">{user.username}'s Uploaded Recipes</h1>
 
       {myRecipes.length === 0 ? (
         <p className="no-recipes-msg">
@@ -56,7 +64,7 @@ const MyRecipesPage: React.FC<MyRecipesPageProps> = ({ user }) => {
                 <p className="recipe-card-category">{recipe.category || 'Uncategorized'}</p>
                 <p className="recipe-card-description">{recipe.description}</p>
                 <div className="recipe-card-actions">
-                  <Link to={`/recipes/${recipe.id}`} className="recipe-card-link">
+                  <Link to={`/recipe/${recipe.id}`} className="recipe-card-link">
                     View
                   </Link>
                   <button

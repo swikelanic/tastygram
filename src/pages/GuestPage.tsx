@@ -6,22 +6,22 @@ import './GuestPage.css';
 
 interface GuestPageProps {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  darkMode?: boolean; // ← Add this
 }
 
-const GuestPage: React.FC<GuestPageProps> = ({ setUser }) => {
+const GuestPage: React.FC<GuestPageProps> = ({ setUser, darkMode = false }) => {
   const navigate = useNavigate();
 
   const handleGuestContinue = () => {
-    // Create a temporary guest user satisfying the User type
     setUser({
-      id: 'guest',       // temporary guest id
-      username: 'Guest', // guest name
+      id: 'guest',
+      username: 'Guest',
     });
     navigate('/recipes');
   };
 
   return (
-    <div className="guest-container">
+    <div className={`guest-container ${darkMode ? 'dark' : ''}`}>
       <div className="guest-card">
         <h1>Welcome, Guest!</h1>
         <p>You can browse recipes, but to upload your own, please sign up or log in.</p>

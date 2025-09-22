@@ -4,9 +4,10 @@ import { User } from '../types';
 
 interface SignupFormProps {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  darkMode?: boolean; // ← Add darkMode prop (optional)
 }
 
-const SignupForm: React.FC<SignupFormProps> = ({ setUser }) => {
+const SignupForm: React.FC<SignupFormProps> = ({ setUser, darkMode = false }) => {
   const [username, setUsername] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -27,6 +28,10 @@ const SignupForm: React.FC<SignupFormProps> = ({ setUser }) => {
         flexDirection: 'column',
         gap: '1rem',
         textAlign: 'center',
+        backgroundColor: darkMode ? '#1f2937' : '#ffffff',
+        color: darkMode ? '#f9fafb' : '#111827',
+        padding: '1rem',
+        borderRadius: '8px',
       }}
     >
       <input
@@ -35,7 +40,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ setUser }) => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
-        style={{ padding: '8px', fontSize: '1rem' }}
+        style={{
+          padding: '8px',
+          fontSize: '1rem',
+          border: darkMode ? '1px solid #374151' : '1px solid #d1d5db',
+          borderRadius: '4px',
+          backgroundColor: darkMode ? '#374151' : '#ffffff',
+          color: darkMode ? '#f9fafb' : '#111827',
+        }}
       />
       <button
         type="submit"

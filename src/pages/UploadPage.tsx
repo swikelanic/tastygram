@@ -6,10 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import './UploadPage.css';
 
 interface UploadPageProps {
-  user: User;
+  user?: User | null; // allow null/undefined for safety
+  darkMode?: boolean;
 }
 
-const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
+const UploadPage: React.FC<UploadPageProps> = ({ user, darkMode = false }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -22,7 +23,6 @@ const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Load recipe for editing if coming from "Edit" click
   useEffect(() => {
     const state = location.state as { recipe?: Recipe };
     if (state?.recipe) {
@@ -50,6 +50,10 @@ const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      alert('You must be logged in to submit a recipe.');
+      return;
+    }
 
     const newRecipe: Recipe = {
       id: editingId || uuidv4(),
@@ -62,83 +66,84 @@ const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
       imageUrl: imagePreview || '',
     };
 
-    // Load existing recipes from localStorage
     const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
 
     if (editingId) {
-      // Update existing recipe
       const updatedRecipes = savedRecipes.map((r) => (r.id === editingId ? newRecipe : r));
       localStorage.setItem('uploaded_recipes', JSON.stringify(updatedRecipes));
       alert('Recipe updated successfully!');
     } else {
-      // Add new recipe
       savedRecipes.push(newRecipe);
       localStorage.setItem('uploaded_recipes', JSON.stringify(savedRecipes));
       alert('Recipe submitted successfully!');
     }
 
-    navigate('/my-recipes'); // Redirect to My Recipes page
+    navigate('/my-recipes');
   };
 
   return (
-    <div className="upload-container">
+    <div className={`upload-container ${darkMode ? 'dark-mode' : ''}`}>
       <h1 className="upload-title">{editingId ? 'Edit Recipe' : 'Upload a New Recipe'}</h1>
-      <form className="upload-form" onSubmit={handleSubmit}>
-        <label>Title</label>
-        <input
-          type="text"
-          placeholder="Recipe title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+      {!user ? (
+        <p>Please log in to upload a recipe.</p>
+      ) : (
+        <form className="upload-form" onSubmit={handleSubmit}>
+          <label>Title</label>
+          <input
+            type="text"
+            placeholder="Recipe title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-        <label>Description</label>
-        <textarea
-          placeholder="Short description of the recipe"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
+          <label>Description</label>
+          <textarea
+            placeholder="Short description of the recipe"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
 
-        <label>Category</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-          <option value="">Select a category</option>
-          <option value="African Traditional Food">African Traditional Food</option>
-          <option value="Desserts">Desserts</option>
-          <option value="Italian">Italian</option>
-          <option value="Indian">Indian</option>
-          <option value="Mexican">Mexican</option>
-          <option value="Other">Other</option>
-        </select>
+          <label>Category</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+            <option value="">Select a category</option>
+            <option value="African Traditional Food">African Traditional Food</option>
+            <option value="Desserts">Desserts</option>
+            <option value="Italian">Italian</option>
+            <option value="Indian">Indian</option>
+            <option value="Mexican">Mexican</option>
+            <option value="Other">Other</option>
+          </select>
 
-        <label>Upload Image</label>
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-        {imagePreview && (
-          <div className="image-preview">
-            <img src={imagePreview} alt="Preview" />
-          </div>
-        )}
+          <label>Upload Image</label>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {imagePreview && (
+            <div className="image-preview">
+              <img src={imagePreview} alt="Preview" />
+            </div>
+          )}
 
-        <label>Ingredients (comma-separated)</label>
-        <input
-          type="text"
-          placeholder="e.g. rice, tomatoes, onions"
-          value={ingredients}
-          onChange={(e) => setIngredients(e.target.value)}
-          required
-        />
+          <label>Ingredients (comma-separated)</label>
+          <input
+            type="text"
+            placeholder="e.g. rice, tomatoes, onions"
+            value={ingredients}
+            onChange={(e) => setIngredients(e.target.value)}
+            required
+          />
 
-        <label>Steps</label>
-        <textarea
-          placeholder="Explain the recipe steps"
-          value={steps}
-          onChange={(e) => setSteps(e.target.value)}
-          required
-        />
+          <label>Steps</label>
+          <textarea
+            placeholder="Explain the recipe steps"
+            value={steps}
+            onChange={(e) => setSteps(e.target.value)}
+            required
+          />
 
-        <button type="submit">{editingId ? 'Update Recipe' : 'Submit Recipe'}</button>
-      </form>
+          <button type="submit">{editingId ? 'Update Recipe' : 'Submit Recipe'}</button>
+        </form>
+      )}
     </div>
   );
 };

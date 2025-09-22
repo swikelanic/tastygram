@@ -1,3 +1,4 @@
+// src/pages/RecipeDetailPage.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Recipe } from "../types";
@@ -5,6 +6,7 @@ import './RecipeDetailPage.css';
 
 interface RecipeDetailPageProps {
   recipes: Recipe[];
+  darkMode: boolean; // <-- Add this
 }
 
 interface Review {
@@ -13,7 +15,7 @@ interface Review {
   comment: string;
 }
 
-const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
+const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes, darkMode }) => {
   const { id } = useParams<{ id: string }>();
   const recipe = recipes.find((r) => r.id === id);
 
@@ -23,7 +25,6 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
 
-  // Load likes and reviews from localStorage
   useEffect(() => {
     if (!recipe) return;
     const savedLikes = JSON.parse(localStorage.getItem('likedRecipes') || '{}');
@@ -58,18 +59,16 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
     setRating(5);
   };
 
-  if (!recipe) return <p className="recipe-not-found">Recipe not found</p>;
+  if (!recipe) return <p className={`recipe-not-found ${darkMode ? 'dark' : ''}`}>Recipe not found</p>;
 
   const stepList = recipe.steps?.split(/\.|\n/).map((s) => s.trim()).filter((s) => s.length > 0) ?? [];
 
-  // Compute average rating
   const averageRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : null;
 
   return (
-    <main className="recipe-page">
-      {/* Hero Section */}
+    <main className={`recipe-page ${darkMode ? 'dark' : ''}`}>
       <div className="recipe-hero">
         {recipe.imageUrl ? <img src={recipe.imageUrl} alt={recipe.title} /> : <div>No image available</div>}
         <div className="recipe-hero-overlay">
@@ -78,7 +77,6 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
         </div>
       </div>
 
-      {/* Info */}
       <div className="recipe-info">
         <div>
           <p>Uploaded by</p>
@@ -92,7 +90,6 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
 
       {recipe.description && <p className="recipe-description">{recipe.description}</p>}
 
-      {/* Ingredients & Steps */}
       <div className="recipe-grid">
         <section className="recipe-section">
           <h2>Ingredients</h2>
@@ -105,7 +102,6 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
         </section>
       </div>
 
-      {/* Like button */}
       <div style={{ marginTop: '1rem' }}>
         <button
           onClick={toggleLike}
@@ -115,7 +111,6 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
         </button>
       </div>
 
-      {/* Reviews Section */}
       <section className="recipe-reviews" style={{ marginTop: '2rem' }}>
         <h2>Reviews {averageRating && <span>⭐ {averageRating}</span>}</h2>
 
@@ -130,7 +125,6 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({ recipes }) => {
           </ul>
         ) : <p>No reviews yet. Be the first to review!</p>}
 
-        {/* Add new review */}
         <form onSubmit={submitReview} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <input
             type="text"

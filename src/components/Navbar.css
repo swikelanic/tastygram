@@ -1,16 +1,18 @@
+/* Base Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ffffff; /* white background for elegance */
+  background-color: #ffffff; /* light mode background */
   padding: 1rem 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  color: #bfa34a; /* soft gold for text */
+  color: #bfa34a; /* gold text */
   font-family: 'Segoe UI', sans-serif;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .navbar-logo a {
-  color: #bfa34a; /* gold logo */
+  color: #bfa34a;
   font-size: 1.8rem;
   font-weight: bold;
   text-decoration: none;
@@ -23,35 +25,85 @@
 }
 
 .navbar-links li a {
-  color: #333333; /* darker text for readability */
+  color: #333333; /* dark text for light mode */
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
 }
 
 .navbar-links li a:hover {
-  color: #bfa34a; /* gold on hover */
+  color: #bfa34a; /* gold hover */
 }
 
 .navbar-search input {
   padding: 0.4rem 0.6rem;
   border-radius: 5px;
-  border: 1px solid #bfa34a; /* subtle gold border */
+  border: 1px solid #bfa34a;
   outline: none;
   color: #333333;
+  background-color: #ffffff;
 }
 
 .navbar-search button {
   padding: 0.4rem 0.8rem;
   margin-left: 0.5rem;
   border: none;
-  background-color: #bfa34a; /* gold button */
-  color: #ffffff; /* white text inside button */
+  background-color: #bfa34a;
+  color: #ffffff;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .navbar-search button:hover {
-  background-color: #d4b65a; /* slightly lighter gold on hover */
+  background-color: #d4b65a;
+}
+
+/* Dark Mode */
+.navbar.dark-mode {
+  background-color: #1e1e1e; /* dark gray background */
+  color: #f5d27a; /* soft gold for text */
+}
+
+.navbar.dark-mode .navbar-logo a {
+  color: #f5d27a;
+}
+
+.navbar.dark-mode .navbar-links li a {
+  color: #f5f5f5; /* light text for dark mode */
+}
+
+.navbar.dark-mode .navbar-links li a:hover {
+  color: #f5d27a;
+}
+
+.navbar.dark-mode .navbar-search input {
+  background-color: #2c2c2c;
+  border: 1px solid #f5d27a;
+  color: #f5f5f5;
+}
+
+.navbar.dark-mode .navbar-search button {
+  background-color: #f5d27a;
+  color: #1e1e1e;
+}
+
+.navbar.dark-mode .navbar-search button:hover {
+  background-color: #d4b65a;
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle {
+  margin-left: 1rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background-color: #bfa34a;
+  color: #ffffff;
+  transition: background-color 0.3s;
+}
+
+.dark-mode-toggle:hover {
+  background-color: #d4b65a;
 }
