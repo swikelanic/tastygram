@@ -52,6 +52,10 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser }) => {
               <Link to="/upload">Upload</Link>
             </li>
             <li>
+              {/* NEW: My Recipes Link */}
+              <Link to="/my-recipes">My Recipes</Link>
+            </li>
+            <li>
               <button onClick={handleLogout}>Logout</button>
             </li>
           </>

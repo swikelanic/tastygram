@@ -1,7 +1,8 @@
 // src/pages/UploadPage.tsx
-import React, { useState } from 'react';
-import { User } from '../types';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { User, Recipe } from '../types';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import './UploadPage.css';
 
 interface UploadPageProps {
@@ -16,19 +17,33 @@ const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [ingredients, setIngredients] = useState('');
   const [steps, setSteps] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Load recipe for editing if coming from "Edit" click
+  useEffect(() => {
+    const state = location.state as { recipe?: Recipe };
+    if (state?.recipe) {
+      const r = state.recipe;
+      setEditingId(r.id || null);
+      setTitle(r.title || '');
+      setDescription(r.description || '');
+      setCategory(r.category || '');
+      setImagePreview(r.imageUrl || null);
+      setIngredients(r.ingredients?.join(', ') || '');
+      setSteps(r.steps || '');
+    }
+  }, [location.state]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
 
-      // Preview the selected image
       const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
+      reader.onload = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -36,24 +51,38 @@ const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // For now, just log the data
-    console.log({
+    const newRecipe: Recipe = {
+      id: editingId || uuidv4(),
       title,
       description,
       category,
-      imageFile,
       ingredients: ingredients.split(',').map((i) => i.trim()),
       steps,
       author: user.username,
-    });
+      imageUrl: imagePreview || '',
+    };
 
-    alert('Recipe submitted successfully!');
-    navigate('/recipes'); // Redirect to recipes page
+    // Load existing recipes from localStorage
+    const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
+
+    if (editingId) {
+      // Update existing recipe
+      const updatedRecipes = savedRecipes.map((r) => (r.id === editingId ? newRecipe : r));
+      localStorage.setItem('uploaded_recipes', JSON.stringify(updatedRecipes));
+      alert('Recipe updated successfully!');
+    } else {
+      // Add new recipe
+      savedRecipes.push(newRecipe);
+      localStorage.setItem('uploaded_recipes', JSON.stringify(savedRecipes));
+      alert('Recipe submitted successfully!');
+    }
+
+    navigate('/my-recipes'); // Redirect to My Recipes page
   };
 
   return (
     <div className="upload-container">
-      <h1 className="upload-title">Upload a New Recipe</h1>
+      <h1 className="upload-title">{editingId ? 'Edit Recipe' : 'Upload a New Recipe'}</h1>
       <form className="upload-form" onSubmit={handleSubmit}>
         <label>Title</label>
         <input
@@ -108,7 +137,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
           required
         />
 
-        <button type="submit">Submit Recipe</button>
+        <button type="submit">{editingId ? 'Update Recipe' : 'Submit Recipe'}</button>
       </form>
     </div>
   );

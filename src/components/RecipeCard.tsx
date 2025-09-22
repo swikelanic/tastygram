@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Recipe } from '../types';
+import { Recipe, Review } from '../types';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -9,6 +9,7 @@ interface RecipeCardProps {
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const [hovered, setHovered] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
 
   // Load like state from localStorage
   useEffect(() => {
@@ -27,11 +28,17 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
     });
   };
 
+  // Compute average rating
+  const averageRating =
+    recipe.reviews && recipe.reviews.length > 0
+      ? (
+          recipe.reviews.reduce((sum, r) => sum + r.rating, 0) /
+          recipe.reviews.length
+        ).toFixed(1)
+      : null;
+
   return (
-    <Link
-      to={`/recipes/${recipe.id}`}
-      style={{ textDecoration: 'none', color: 'inherit' }}
-    >
+    <Link to={`/recipes/${recipe.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -55,14 +62,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         }}
       >
         {/* Title */}
-        <h3
-          style={{
-            margin: 0,
-            fontWeight: 700,
-            fontSize: '1.6rem',
-            color: '#5a3e36',
-          }}
-        >
+        <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.6rem', color: '#5a3e36' }}>
           {recipe.title}
         </h3>
 
@@ -85,37 +85,59 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         )}
 
         {/* Recipe Info */}
-        <div
-          style={{
-            fontSize: '0.9rem',
-            color: '#6b5b54',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.3rem',
-          }}
-        >
+        <div style={{ fontSize: '0.9rem', color: '#6b5b54', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
           <p>
-            <strong style={{ fontWeight: 600, color: '#7d5a50' }}>
-              Category:
-            </strong>{' '}
+            <strong style={{ fontWeight: 600, color: '#7d5a50' }}>Category:</strong>{' '}
             {recipe.category || 'N/A'}
           </p>
         </div>
 
-        {/* Heart Button below */}
+        {/* Heart button */}
         <button
           onClick={toggleLike}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '1.5rem',
-            alignSelf: 'flex-start',
-          }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', alignSelf: 'flex-start' }}
           aria-label={liked ? 'Unlike recipe' : 'Like recipe'}
         >
           {liked ? '❤️' : '🤍'}
         </button>
+
+        {/* Review Section */}
+        {averageRating && (
+          <div style={{ marginTop: '0.5rem', borderTop: '1px solid #ddd', paddingTop: '0.5rem' }}>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: '#444' }}>
+              ⭐ {averageRating} ({recipe.reviews?.length} reviews)
+            </p>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setShowReviews((prev) => !prev);
+              }}
+              style={{
+                marginTop: '0.3rem',
+                background: '#f5f5f5',
+                border: 'none',
+                padding: '0.3rem 0.6rem',
+                borderRadius: 6,
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+              }}
+            >
+              {showReviews ? 'Hide Reviews' : 'Show Reviews'}
+            </button>
+
+            {showReviews && recipe.reviews && (
+              <div style={{ marginTop: '0.5rem', maxHeight: '150px', overflowY: 'auto', padding: '0.3rem', background: '#fafafa', borderRadius: 6 }}>
+                {recipe.reviews.map((r: Review, idx) => (
+                  <div key={idx} style={{ marginBottom: '0.5rem', borderBottom: '1px solid #eee', paddingBottom: '0.3rem' }}>
+                    <p style={{ margin: 0, fontWeight: 600, fontSize: '0.85rem', color: '#5a3e36' }}>{r.username}</p>
+                    <p style={{ margin: 0, fontSize: '0.8rem' }}>⭐ {r.rating}</p>
+                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#555' }}>{r.comment}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Link>
   );

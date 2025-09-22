@@ -1,5 +1,5 @@
 // src/App.tsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import WelcomePage from './pages/WelcomePage'
@@ -8,6 +8,7 @@ import RecipeDetailPage from './pages/RecipeDetailPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import GuestPage from './pages/GuestPage'
+import MyRecipesPage from './pages/MyRecipesPage';
 import UploadPage from './pages/UploadPage'
 import { Recipe, User } from './types'
 
@@ -307,10 +308,16 @@ const sampleRecipes: Recipe[] = [
 const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [user, setUser] = useState<User | null>(null)
+  const [recipes, setRecipes] = useState<Recipe[]>(sampleRecipes)
+
+  // Load uploaded recipes from localStorage and merge with sampleRecipes
+  useEffect(() => {
+    const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]')
+    setRecipes([...sampleRecipes, ...savedRecipes])
+  }, [])
 
   return (
     <Router>
-      {/* Pass user and setUser to Navbar */}
       <Navbar onSearch={setSearchQuery} user={user} setUser={setUser} />
 
       <Routes>
@@ -320,17 +327,16 @@ const App: React.FC = () => {
         <Route path="/guest" element={<GuestPage setUser={setUser} />} />
 
         {/* Upload page only accessible if logged in */}
-        {user && <Route path="/upload" element={<UploadPage user={user} />} />}
+        <Route path="/upload" element={user ? <UploadPage user={user} /> : <Navigate to="/login" />} />
 
-        <Route
-          path="/recipes"
-          element={<RecipesPage recipes={sampleRecipes} searchQuery={searchQuery} />}
-        />
-        <Route
-          path="/recipes/:id"
-          element={<RecipeDetailPage recipes={sampleRecipes} />}
-        />
+        {/* My Uploaded Recipes */}
+        <Route path="/my-recipes" element={user ? <MyRecipesPage user={user} /> : <Navigate to="/login" />} />
 
+        {/* All Recipes */}
+        <Route path="/recipes" element={<RecipesPage recipes={recipes} searchQuery={searchQuery} />} />
+        <Route path="/recipes/:id" element={<RecipeDetailPage recipes={recipes} />} />
+
+        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

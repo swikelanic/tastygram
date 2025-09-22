@@ -183,3 +183,92 @@
   background-color: #f3ddb0;
   box-shadow: 0 8px 20px rgba(0,0,0,0.07);
 }
+
+/* Reviews Section */
+.recipe-reviews {
+  background-color: #fff;
+  border-radius: 2rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  padding: 2rem;
+  margin-top: 3rem;
+  transition: all 0.3s ease-in-out;
+}
+.recipe-reviews:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+.recipe-reviews h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f7e8c8;
+  padding-bottom: 0.5rem;
+  color: #444;
+}
+.recipe-reviews ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.recipe-reviews li {
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+  transition: background 0.3s ease;
+}
+.recipe-reviews li:last-child {
+  border-bottom: none;
+}
+.recipe-reviews li:hover {
+  background-color: #f9f5f0;
+}
+.recipe-reviews li strong {
+  font-weight: 600;
+  color: #5a3e36;
+}
+.recipe-reviews li p {
+  margin: 0.3rem 0 0 0;
+  color: #666;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+/* Review Form */
+.recipe-reviews form {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.recipe-reviews input,
+.recipe-reviews select,
+.recipe-reviews textarea {
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+.recipe-reviews input:focus,
+.recipe-reviews select:focus,
+.recipe-reviews textarea:focus {
+  border-color: #f7e8c8;
+  box-shadow: 0 0 8px rgba(247, 232, 200, 0.5);
+  outline: none;
+}
+.recipe-reviews button {
+  width: fit-content;
+  padding: 0.8rem 2rem;
+  border-radius: 1rem;
+  border: none;
+  background-color: #f7e8c8;
+  color: #444;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: all 0.3s ease-in-out;
+}
+.recipe-reviews button:hover {
+  background-color: #f3ddb0;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+}

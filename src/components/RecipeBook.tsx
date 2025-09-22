@@ -6,10 +6,11 @@ interface Props {
 }
 
 const RecipeBook: React.FC<Props> = ({ recipes }) => {
-  // Group recipes by category
+  // Group recipes by category, fallback to 'Uncategorized'
   const grouped = recipes.reduce((acc, recipe) => {
-    acc[recipe.category] = acc[recipe.category] || [];
-    acc[recipe.category].push(recipe);
+    const category = recipe.category || 'Uncategorized';
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(recipe);
     return acc;
   }, {} as Record<string, Recipe[]>);
 
@@ -19,11 +20,8 @@ const RecipeBook: React.FC<Props> = ({ recipes }) => {
   const toggleBookmark = (id: string) => {
     setBookmarks(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
       return newSet;
     });
   };
@@ -34,11 +32,16 @@ const RecipeBook: React.FC<Props> = ({ recipes }) => {
         <section key={category}>
           <h2 className="text-2xl font-semibold mb-2 flex justify-between items-center">
             {category}
-            <span className="text-gray-500 text-sm">{catRecipes.length} {catRecipes.length === 1 ? 'recipe' : 'recipes'}</span>
+            <span className="text-gray-500 text-sm">
+              {catRecipes.length} {catRecipes.length === 1 ? 'recipe' : 'recipes'}
+            </span>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {catRecipes.map(recipe => (
-              <div key={recipe.id} className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group">
+              <div
+                key={recipe.id}
+                className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer group"
+              >
                 <img
                   src={recipe.imageUrl || 'https://via.placeholder.com/150?text=No+Image'}
                   alt={recipe.title}
