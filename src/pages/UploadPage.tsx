@@ -1,148 +1,117 @@
-import React, { useState } from 'react'
-import { Recipe, User } from '../types'
-import { getRecipes, saveRecipes } from '../utils/localStorage'
-import { useNavigate } from 'react-router-dom'
-import { v4 as uuidv4 } from 'uuid'
+// src/pages/UploadPage.tsx
+import React, { useState } from 'react';
+import { User } from '../types';
+import { useNavigate } from 'react-router-dom';
+import './UploadPage.css';
 
-interface Props {
-  user: User
+interface UploadPageProps {
+  user: User;
 }
 
-const categories = [
-  'African Traditional Food',
-  'Desserts',
-  'Breakfast',
-  'Vegetarian',
-  'Seafood',
-  'Beverages',
-]
+const UploadPage: React.FC<UploadPageProps> = ({ user }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [ingredients, setIngredients] = useState('');
+  const [steps, setSteps] = useState('');
 
-// Default images for categories
-const defaultImages: Record<string, string> = {
-  'African Traditional Food': 'https://images.unsplash.com/photo-1604908815316-75b1e9d3d6bc?auto=format&fit=crop&w=800&q=80',
-  'Desserts': 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&q=80',
-  'Breakfast': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-  'Vegetarian': 'https://images.unsplash.com/photo-1543352634-6914a1b0c8b9?auto=format&fit=crop&w=800&q=80',
-  'Seafood': 'https://images.unsplash.com/photo-1604908177008-dfb8f1e5dbed?auto=format&fit=crop&w=800&q=80',
-  'Beverages': 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=800&q=80',
-}
+  const navigate = useNavigate();
 
-const UploadPage: React.FC<Props> = ({ user }) => {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [category, setCategory] = useState(categories[0])
-  const [imageUrl, setImageUrl] = useState('')
-  const [ingredientsInput, setIngredientsInput] = useState('')
-  const [steps, setSteps] = useState('')
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
 
-  const navigate = useNavigate()
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-
-    if (!title.trim() || !description.trim() || !ingredientsInput.trim() || !steps.trim()) {
-      alert('Please fill in all required fields.')
-      return
+      // Preview the selected image
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
+  };
 
-    // Use user-provided image URL or fallback to category default
-    const finalImageUrl = imageUrl.trim() || defaultImages[category] || 'https://via.placeholder.com/300x200?text=No+Image'
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-    const newRecipe: Recipe = {
-      id: uuidv4(),
-      title: title.trim(),
-      description: description.trim(),
+    // For now, just log the data
+    console.log({
+      title,
+      description,
       category,
-      imageUrl: finalImageUrl,
+      imageFile,
+      ingredients: ingredients.split(',').map((i) => i.trim()),
+      steps,
       author: user.username,
-      ingredients: ingredientsInput.split(',').map(item => item.trim()).filter(Boolean),
-      steps: steps.trim(),
-    }
+    });
 
-    const recipes = getRecipes()
-    saveRecipes([...recipes, newRecipe])
-
-    navigate('/')
-  }
+    alert('Recipe submitted successfully!');
+    navigate('/recipes'); // Redirect to recipes page
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto bg-yellow-100 p-6 rounded shadow space-y-4">
-      <h2 className="text-xl font-semibold text-yellow-900">Upload a New Recipe</h2>
-
-      <label className="block">
-        <span className="text-yellow-900 font-semibold">Title</span>
+    <div className="upload-container">
+      <h1 className="upload-title">Upload a New Recipe</h1>
+      <form className="upload-form" onSubmit={handleSubmit}>
+        <label>Title</label>
         <input
           type="text"
+          placeholder="Recipe title"
           value={title}
-          onChange={e => setTitle(e.target.value)}
-          className="mt-1 p-2 w-full border border-yellow-300 rounded"
+          onChange={(e) => setTitle(e.target.value)}
           required
         />
-      </label>
 
-      <label className="block">
-        <span className="text-yellow-900 font-semibold">Description</span>
+        <label>Description</label>
         <textarea
+          placeholder="Short description of the recipe"
           value={description}
-          onChange={e => setDescription(e.target.value)}
-          className="mt-1 p-2 w-full border border-yellow-300 rounded"
-          rows={3}
+          onChange={(e) => setDescription(e.target.value)}
           required
         />
-      </label>
 
-      <label className="block">
-        <span className="text-yellow-900 font-semibold">Category</span>
-        <select
-          value={category}
-          onChange={e => setCategory(e.target.value)}
-          className="mt-1 p-2 w-full border border-yellow-300 rounded"
-        >
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
+        <label>Category</label>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+          <option value="">Select a category</option>
+          <option value="African Traditional Food">African Traditional Food</option>
+          <option value="Desserts">Desserts</option>
+          <option value="Italian">Italian</option>
+          <option value="Indian">Indian</option>
+          <option value="Mexican">Mexican</option>
+          <option value="Other">Other</option>
         </select>
-      </label>
 
-      <label className="block">
-        <span className="text-yellow-900 font-semibold">Image URL (optional)</span>
-        <input
-          type="url"
-          value={imageUrl}
-          onChange={e => setImageUrl(e.target.value)}
-          className="mt-1 p-2 w-full border border-yellow-300 rounded"
-        />
-      </label>
+        <label>Upload Image</label>
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        {imagePreview && (
+          <div className="image-preview">
+            <img src={imagePreview} alt="Preview" />
+          </div>
+        )}
 
-      <label className="block">
-        <span className="text-yellow-900 font-semibold">Ingredients (comma-separated)</span>
+        <label>Ingredients (comma-separated)</label>
         <input
           type="text"
-          value={ingredientsInput}
-          onChange={e => setIngredientsInput(e.target.value)}
-          className="mt-1 p-2 w-full border border-yellow-300 rounded"
           placeholder="e.g. rice, tomatoes, onions"
+          value={ingredients}
+          onChange={(e) => setIngredients(e.target.value)}
           required
         />
-      </label>
 
-      <label className="block">
-        <span className="text-yellow-900 font-semibold">Steps</span>
+        <label>Steps</label>
         <textarea
-          value={steps}
-          onChange={e => setSteps(e.target.value)}
-          className="mt-1 p-2 w-full border border-yellow-300 rounded"
-          rows={4}
           placeholder="Explain the recipe steps"
+          value={steps}
+          onChange={(e) => setSteps(e.target.value)}
           required
         />
-      </label>
 
-      <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
-        Submit
-      </button>
-    </form>
-  )
-}
+        <button type="submit">Submit Recipe</button>
+      </form>
+    </div>
+  );
+};
 
-export default UploadPage
+export default UploadPage;

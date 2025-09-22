@@ -1,43 +1,74 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
+import '../components/Navbar.css';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User } from '../types';
 
 interface NavbarProps {
-  onSearch?: (query: string) => void; // made optional
+  onSearch: React.Dispatch<React.SetStateAction<string>>;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
-  const [search, setSearch] = useState("");
+const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser }) => {
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSearch) {
-      onSearch(search); // only call if provided
-    }
-    navigate("/recipes"); // Redirect to recipes page
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    onSearch(e.target.value);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    navigate('/');
   };
 
   return (
     <nav className="navbar">
+      {/* Logo */}
       <div className="navbar-logo">
-        <Link to="/">Tastygram</Link>
+        <a onClick={() => navigate('/')}>TastyGram</a>
       </div>
 
-      <ul className="navbar-links">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/recipes">Recipes</Link></li>
-      </ul>
-
-      <form className="navbar-search" onSubmit={handleSearch}>
+      {/* Search bar */}
+      <div className="navbar-search">
         <input
           type="text"
-          placeholder="Search recipes..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={handleSearchChange}
+          placeholder="Search recipes..."
         />
-        <button type="submit">🔍</button>
-      </form>
+      </div>
+
+      {/* Menu links */}
+      <ul className="navbar-links">
+        <li>
+          <Link to="/recipes">Recipes</Link>
+        </li>
+        {user ? (
+          <>
+            <li>Hi, {user.username}</li>
+            <li>
+              <Link to="/upload">Upload</Link>
+            </li>
+            <li>
+              <button onClick={handleLogout}>Logout</button>
+            </li>
+          </>
+        ) : (
+          <>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+            <li>
+              <Link to="/signup">Sign Up</Link>
+            </li>
+            <li>
+              <Link to="/guest">Guest</Link>
+            </li>
+          </>
+        )}
+      </ul>
     </nav>
   );
 };

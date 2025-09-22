@@ -1,11 +1,43 @@
 // src/pages/GuestPage.tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User } from '../types';
+import './GuestPage.css';
 
-const GuestPage: React.FC = () => {
+interface GuestPageProps {
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+const GuestPage: React.FC<GuestPageProps> = ({ setUser }) => {
+  const navigate = useNavigate();
+
+  const handleGuestContinue = () => {
+    // Create a temporary guest user satisfying the User type
+    setUser({
+      id: 'guest',       // temporary guest id
+      username: 'Guest', // guest name
+    });
+    navigate('/recipes');
+  };
+
   return (
-    <div>
-      <h1>Welcome, Guest!</h1>
-      <p>This is the guest page.</p>
+    <div className="guest-container">
+      <div className="guest-card">
+        <h1>Welcome, Guest!</h1>
+        <p>You can browse recipes, but to upload your own, please sign up or log in.</p>
+
+        <div className="guest-buttons">
+          <button className="cta-button guest-continue" onClick={handleGuestContinue}>
+            Continue as Guest
+          </button>
+          <button className="cta-button login" onClick={() => navigate('/login')}>
+            Login
+          </button>
+          <button className="cta-button signup" onClick={() => navigate('/signup')}>
+            Sign Up
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

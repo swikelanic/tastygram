@@ -1,32 +1,24 @@
 // src/components/LoginForm.tsx
-
 import React, { useState } from 'react';
-import { useRecipeContext } from '../context/RecipeContext';
+import { User } from '../types';
 
-const LoginForm = () => {
+interface LoginFormProps {
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ setUser }) => {
   const [username, setUsername] = useState('');
-  const { login, user, logout } = useRecipeContext();
-
-  if (user) {
-    return (
-      <div>
-        <p>Welcome, {user.username}!</p>
-        <button onClick={logout}>Logout</button>
-      </div>
-    );
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedUsername = username.trim();
-    if (trimmedUsername !== '') {
-      login(trimmedUsername);
+    if (username.trim() !== '') {
+      setUser({ id: Date.now().toString(), username: username.trim() });
       setUsername('');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={styles.form}>
+    <form onSubmit={handleSubmit} style={{ maxWidth: '300px', margin: '2rem auto', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'center' }}>
       <h2>Login</h2>
       <input
         type="text"
@@ -34,37 +26,13 @@ const LoginForm = () => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
-        style={styles.input}
+        style={{ padding: '8px', fontSize: '1rem' }}
       />
-      <button type="submit" style={styles.button}>
+      <button type="submit" style={{ padding: '10px', fontSize: '1.1rem', backgroundColor: '#007BFF', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
         Login
       </button>
     </form>
   );
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-  form: {
-    maxWidth: '300px',
-    margin: '2rem auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    textAlign: 'center',
-  },
-  input: {
-    padding: '8px',
-    fontSize: '1rem',
-  },
-  button: {
-    padding: '10px',
-    fontSize: '1.1rem',
-    backgroundColor: '#007BFF',
-    color: 'white',
-    border: 'none',
-    cursor: 'pointer',
-    borderRadius: '4px',
-  },
 };
 
 export default LoginForm;

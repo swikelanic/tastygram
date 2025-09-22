@@ -1,44 +1,45 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import WelcomePage from './pages/WelcomePage';
-import RecipesPage from './pages/RecipesPage';
-import RecipeDetailPage from './pages/RecipeDetailPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import GuestPage from './pages/GuestPage';
-import { Recipe } from './types';
+// src/App.tsx
+import React, { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import WelcomePage from './pages/WelcomePage'
+import RecipesPage from './pages/RecipesPage'
+import RecipeDetailPage from './pages/RecipeDetailPage'
+import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
+import GuestPage from './pages/GuestPage'
+import UploadPage from './pages/UploadPage'
+import { Recipe, User } from './types'
 
-// Import all images with exact filenames
-import carbonara from './assets/carbonara.jpg';
-import butterChicken from './assets/Butter-Chicken.jpg';
-import foods from './assets/foods.jpg';
-import sam from './assets/sam.jpg';
-import tacos from './assets/ttacos.jpg';
-import sushi from './assets/sushi.jpg';
-import bobotie from './assets/bobotie.jpeg';
-import fatcakes from './assets/fatcakes.jpeg';
-import Milktart from './assets/Milk-tart.jpg';
-import Malvapudding from './assets/Malva-pudding.jpg';
+// Import all recipe images
+import carbonara from './assets/carbonara.jpg'
+import butterChicken from './assets/Butter-Chicken.jpg'
+import foods from './assets/foods.jpg'
+import sam from './assets/sam.jpg'
+import tacos from './assets/ttacos.jpg'
+import sushi from './assets/sushi.jpg'
+import bobotie from './assets/bobotie.jpeg'
+import fatcakes from './assets/fatcakes.jpeg'
+import Milktart from './assets/Milk-tart.jpg'
+import Malvapudding from './assets/Malva-pudding.jpg'
+import brownies from './assets/brownies.jpeg'
+import cheesecake from './assets/cheesecake.jpeg'
+import tiramisu from './assets/tiramisu.jpeg'
+import cremebrulee from './assets/cremebrulee.jpeg'
+import applepie from './assets/applepie.jpeg'
+import pavlova from './assets/pavlova.jpeg'
+import cupcakes from './assets/cupcakes.jpeg'
+import cookies from './assets/cookies.jpeg'
+import bananabread from './assets/bananabread.jpeg'
+import pannacotta from './assets/pannacotta.jpeg'
+import lemonTart from './assets/lemonTart.jpeg'
+import eclairs from './assets/eclairs.jpeg'
+import churros from './assets/churros.jpeg'
+import crepes from './assets/crepes.jpeg'
+import pecanpie from './assets/pecanpie.jpeg'
+import raspberrycheesecake from './assets/raspberrycheesecake.jpeg'
 
-// Desserts
-import brownies from './assets/brownies.jpeg';
-import cheesecake from './assets/cheesecake.jpeg';
-import tiramisu from './assets/tiramisu.jpeg';
-import cremebrulee from './assets/cremebrulee.jpeg';
-import applepie from './assets/applepie.jpeg';
-import pavlova from './assets/pavlova.jpeg';
-import cupcakes from './assets/cupcakes.jpeg';
-import cookies from './assets/cookies.jpeg';
-import bananabread from './assets/bananabread.jpeg';
-import pannacotta from './assets/pannacotta.jpeg';
-import lemonTart from './assets/lemonTart.jpeg';
-import eclairs from './assets/eclairs.jpeg';
-import churros from './assets/churros.jpeg';
-import crepes from './assets/crepes.jpeg';
-import pecanpie from './assets/pecanpie.jpeg';
-import raspberrycheesecake from './assets/raspberrycheesecake.jpeg';
-
+// Sample recipes array
 const sampleRecipes: Recipe[] = [
   {
     id: '1',
@@ -300,29 +301,31 @@ const sampleRecipes: Recipe[] = [
     steps: 'Prepare base. Mix cream cheese and sugar. Bake and top with raspberries.',
     author: 'Chef Lisa',
   },
-];
+
+]
 
 const App: React.FC = () => {
-
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('')
+  const [user, setUser] = useState<User | null>(null)
 
   return (
     <Router>
-      {/* Pass search setter to Navbar */}
-      <Navbar onSearch={setSearchQuery} />
+      {/* Pass user and setUser to Navbar */}
+      <Navbar onSearch={setSearchQuery} user={user} setUser={setUser} />
 
       <Routes>
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/guest" element={<GuestPage />} />
+        <Route path="/login" element={<LoginPage setUser={setUser} />} />
+        <Route path="/signup" element={<SignupPage setUser={setUser} />} />
+        <Route path="/guest" element={<GuestPage setUser={setUser} />} />
 
-        {/* Pass searchQuery to RecipesPage */}
+        {/* Upload page only accessible if logged in */}
+        {user && <Route path="/upload" element={<UploadPage user={user} />} />}
+
         <Route
           path="/recipes"
           element={<RecipesPage recipes={sampleRecipes} searchQuery={searchQuery} />}
         />
-
         <Route
           path="/recipes/:id"
           element={<RecipeDetailPage recipes={sampleRecipes} />}
@@ -331,7 +334,7 @@ const App: React.FC = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
-  );
-};
+  )
+}
 
-export default App;
+export default App
