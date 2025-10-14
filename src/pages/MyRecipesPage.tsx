@@ -4,33 +4,38 @@ import { Link, useNavigate } from 'react-router-dom';
 import './MyRecipesPage.css';
 
 interface MyRecipesPageProps {
-  user?: User | null;       // allow null/undefined
-  darkMode?: boolean;       // optional dark mode prop
+  user?: User | null;
+  darkMode?: boolean;
+  recipes: Recipe[]; // shared from App.tsx
+  setRecipes: React.Dispatch<React.SetStateAction<Recipe[]>>; // allow updates to main recipes
 }
 
-const MyRecipesPage: React.FC<MyRecipesPageProps> = ({ user, darkMode = false }) => {
+const MyRecipesPage: React.FC<MyRecipesPageProps> = ({ user, darkMode = false, recipes, setRecipes }) => {
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const navigate = useNavigate();
 
+  // Filter recipes uploaded by this user
   useEffect(() => {
-    if (!user) return; // safety check
-    const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
-    const userRecipes = savedRecipes.filter(r => r.author === user.username);
+    if (!user) return;
+    const userRecipes = recipes.filter(r => r.author === user.username);
     setMyRecipes(userRecipes);
-  }, [user]);
+  }, [user, recipes]);
 
+  // Delete recipe
   const handleDelete = (id: string) => {
     if (!window.confirm('Are you sure you want to delete this recipe?')) return;
 
-    const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
-    const updatedRecipes = savedRecipes.filter(r => r.id !== id);
-    localStorage.setItem('uploaded_recipes', JSON.stringify(updatedRecipes));
+    const updatedRecipes = recipes.filter(r => r.id !== id);
+    setRecipes(updatedRecipes); // update App.tsx state
+    setMyRecipes(myRecipes.filter(r => r.id !== id)); // update local view
 
-    setMyRecipes(myRecipes.filter(r => r.id !== id));
+    // Update only uploaded recipes in localStorage
+    const uploadedRecipes = updatedRecipes.filter(r => r.author === user?.username);
+    localStorage.setItem('uploaded_recipes', JSON.stringify(uploadedRecipes));
   };
 
+  // Edit recipe
   const handleEdit = (recipe: Recipe) => {
-    // Send the recipe in state as 'recipe' to match UploadPage expectation
     navigate('/upload', { state: { recipe } });
   };
 
@@ -64,21 +69,9 @@ const MyRecipesPage: React.FC<MyRecipesPageProps> = ({ user, darkMode = false })
                 <p className="recipe-card-category">{recipe.category || 'Uncategorized'}</p>
                 <p className="recipe-card-description">{recipe.description}</p>
                 <div className="recipe-card-actions">
-                  <Link to={`/recipe/${recipe.id}`} className="recipe-card-link">
-                    View
-                  </Link>
-                  <button
-                    className="recipe-card-btn edit-btn"
-                    onClick={() => handleEdit(recipe)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="recipe-card-btn delete-btn"
-                    onClick={() => handleDelete(recipe.id)}
-                  >
-                    Delete
-                  </button>
+                  <Link to={`/recipe/${recipe.id}`} className="recipe-card-link">View</Link>
+                  <button className="recipe-card-btn edit-btn" onClick={() => handleEdit(recipe)}>Edit</button>
+                  <button className="recipe-card-btn delete-btn" onClick={() => handleDelete(recipe.id)}>Delete</button>
                 </div>
               </div>
             </div>

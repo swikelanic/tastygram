@@ -6,11 +6,13 @@ import { v4 as uuidv4 } from 'uuid';
 import './UploadPage.css';
 
 interface UploadPageProps {
-  user?: User | null; // allow null/undefined for safety
+  user?: User | null; // allow null/undefined
+  recipes?: Recipe[]; // all recipes from App.tsx
+  setRecipes?: React.Dispatch<React.SetStateAction<Recipe[]>>; // update App recipes
   darkMode?: boolean;
 }
 
-const UploadPage: React.FC<UploadPageProps> = ({ user, darkMode = false }) => {
+const UploadPage: React.FC<UploadPageProps> = ({ user, recipes = [], setRecipes, darkMode = false }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -23,6 +25,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ user, darkMode = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Load recipe for editing if passed via state
   useEffect(() => {
     const state = location.state as { recipe?: Recipe };
     if (state?.recipe) {
@@ -66,6 +69,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ user, darkMode = false }) => {
       imageUrl: imagePreview || '',
     };
 
+    // Save to localStorage
     const savedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
 
     if (editingId) {
@@ -76,6 +80,12 @@ const UploadPage: React.FC<UploadPageProps> = ({ user, darkMode = false }) => {
       savedRecipes.push(newRecipe);
       localStorage.setItem('uploaded_recipes', JSON.stringify(savedRecipes));
       alert('Recipe submitted successfully!');
+    }
+
+    // Update main App recipes so RecipesPage shows it immediately
+    if (setRecipes) {
+      const filteredRecipes = recipes.filter((r) => r.id !== newRecipe.id);
+      setRecipes([...filteredRecipes, newRecipe]);
     }
 
     navigate('/my-recipes');

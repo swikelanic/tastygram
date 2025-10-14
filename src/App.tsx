@@ -1,46 +1,46 @@
-// src/App.tsx
-import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import WelcomePage from './pages/WelcomePage'
-import RecipesPage from './pages/RecipesPage'
-import RecipeDetailPage from './pages/RecipeDetailPage'
-import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
-import GuestPage from './pages/GuestPage'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import WelcomePage from './pages/WelcomePage';
+import RecipesPage from './pages/RecipesPage';
+import RecipeDetailPage from './pages/RecipeDetailPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import GuestPage from './pages/GuestPage';
 import MyRecipesPage from './pages/MyRecipesPage';
-import UploadPage from './pages/UploadPage'
-import { Recipe, User } from './types'
+import UploadPage from './pages/UploadPage';
+import { Recipe, User } from './types';
 
 // Import all recipe images
-import carbonara from './assets/carbonara.jpg'
-import butterChicken from './assets/Butter-Chicken.jpg'
-import foods from './assets/foods.jpg'
-import sam from './assets/sam.jpg'
-import tacos from './assets/ttacos.jpg'
-import sushi from './assets/sushi.jpg'
-import bobotie from './assets/bobotie.jpeg'
-import fatcakes from './assets/fatcakes.jpeg'
-import Milktart from './assets/Milk-tart.jpg'
-import Malvapudding from './assets/Malva-pudding.jpg'
-import brownies from './assets/brownies.jpeg'
-import cheesecake from './assets/cheesecake.jpeg'
-import tiramisu from './assets/tiramisu.jpeg'
-import cremebrulee from './assets/cremebrulee.jpeg'
-import applepie from './assets/applepie.jpeg'
-import pavlova from './assets/pavlova.jpeg'
-import cupcakes from './assets/cupcakes.jpeg'
-import cookies from './assets/cookies.jpeg'
-import bananabread from './assets/bananabread.jpeg'
-import pannacotta from './assets/pannacotta.jpeg'
-import lemonTart from './assets/lemonTart.jpeg'
-import eclairs from './assets/eclairs.jpeg'
-import churros from './assets/churros.jpeg'
-import crepes from './assets/crepes.jpeg'
-import pecanpie from './assets/pecanpie.jpeg'
-import raspberrycheesecake from './assets/raspberrycheesecake.jpeg'
+import carbonara from './assets/carbonara.jpg';
+import butterChicken from './assets/Butter-Chicken.jpg';
+import foods from './assets/foods.jpg';
+import sam from './assets/sam.jpg';
+import tacos from './assets/ttacos.jpg';
+import sushi from './assets/sushi.jpg';
+import bobotie from './assets/bobotie.jpeg';
+import fatcakes from './assets/fatcakes.jpeg';
+import Milktart from './assets/Milk-tart.jpg';
+import Malvapudding from './assets/Malva-pudding.jpg';
+import brownies from './assets/brownies.jpeg';
+import cheesecake from './assets/cheesecake.jpeg';
+import tiramisu from './assets/tiramisu.jpeg';
+import cremebrulee from './assets/cremebrulee.jpeg';
+import applepie from './assets/applepie.jpeg';
+import pavlova from './assets/pavlova.jpeg';
+import cupcakes from './assets/cupcakes.jpeg';
+import cookies from './assets/cookies.jpeg';
+import bananabread from './assets/bananabread.jpeg';
+import pannacotta from './assets/pannacotta.jpeg';
+import lemonTart from './assets/lemonTart.jpeg';
+import eclairs from './assets/eclairs.jpeg';
+import churros from './assets/churros.jpeg';
+import crepes from './assets/crepes.jpeg';
+import pecanpie from './assets/pecanpie.jpeg';
+import raspberrycheesecake from './assets/raspberrycheesecake.jpeg';
 
-const recipes: Recipe[] = [
+// Hardcoded recipes
+const initialRecipes: Recipe[] = [
   {
     id: '1',
     title: 'Spaghetti Carbonara',
@@ -302,12 +302,19 @@ const recipes: Recipe[] = [
     author: 'Chef Lisa',
   },
 
-]
+];
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+
+  // Merge hardcoded recipes with uploaded recipes from localStorage
+  useEffect(() => {
+    const uploadedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
+    setRecipes([...initialRecipes, ...uploadedRecipes]);
+  }, []);
 
   return (
     <Router>
@@ -334,11 +341,11 @@ const App: React.FC = () => {
         />
         <Route
           path="/upload"
-          element={<UploadPage user={user} darkMode={darkMode} />}
+          element={<UploadPage user={user} recipes={recipes} setRecipes={setRecipes} darkMode={darkMode} />}
         />
         <Route
           path="/my-recipes"
-          element={<MyRecipesPage user={user} darkMode={darkMode} />}
+          element={<MyRecipesPage user={user} recipes={recipes} setRecipes={setRecipes} darkMode={darkMode} />}
         />
       </Routes>
     </Router>
