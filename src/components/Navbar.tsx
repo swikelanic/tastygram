@@ -13,6 +13,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser, darkMode = false, setDarkMode }) => {
   const [search, setSearch] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false); // mobile menu state
   const navigate = useNavigate();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,64 +24,78 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser, darkMode = fal
   const handleLogout = () => {
     setUser(null);
     navigate('/');
+    setMenuOpen(false); // close menu on logout
   };
 
   return (
     <nav className={`navbar ${darkMode ? 'dark-mode' : ''}`}>
       {/* Logo */}
       <div className="navbar-logo">
-        <a onClick={() => navigate('/')}>TastyGram</a>
+        <a onClick={() => { navigate('/'); setMenuOpen(false); }}>TastyGram</a>
       </div>
 
-      {/* Search bar */}
-      <div className="navbar-search">
-        <input
-          type="text"
-          value={search}
-          onChange={handleSearchChange}
-          placeholder="Search recipes..."
-        />
+      {/* Hamburger toggle for mobile */}
+      <div className="navbar-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
 
-      {/* Dark mode toggle */}
-      {setDarkMode && (
-        <button className="dark-mode-toggle" onClick={() => setDarkMode(!darkMode)}>
-          {darkMode ? '☀️ Light' : '🌙 Dark'}
-        </button>
-      )}
+      {/* Menu links + search */}
+      <div className={`navbar-menu ${menuOpen ? 'active' : ''}`}>
+        <ul className={`navbar-links ${menuOpen ? 'active' : ''}`}>
+          <li>
+            <Link to="/recipes" onClick={() => setMenuOpen(false)}>Recipes</Link>
+          </li>
 
-      {/* Menu links */}
-      <ul className="navbar-links">
-        <li>
-          <Link to="/recipes">Recipes</Link>
-        </li>
-        {user ? (
-          <>
-            <li>Hi, {user.username}</li>
-            <li>
-              <Link to="/upload">Upload</Link>
-            </li>
-            <li>
-              <Link to="/my-recipes">My Recipes</Link>
-            </li>
-            <li>
-              <button onClick={handleLogout}>Logout</button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <Link to="/login">Login</Link>
-            </li>
-            <li>
-              <Link to="/signup">Sign Up</Link>
-            </li>
-            <li>
-              <Link to="/guest">Guest</Link>
-            </li>
-          </>
+          {user ? (
+            <>
+              <li>Hi, {user.username}</li>
+              <li>
+                <Link to="/upload" onClick={() => setMenuOpen(false)}>Upload</Link>
+              </li>
+              <li>
+                <Link to="/my-recipes" onClick={() => setMenuOpen(false)}>My Recipes</Link>
+              </li>
+              <li>
+                <button onClick={handleLogout}>Logout</button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link to="/login" onClick={() => setMenuOpen(false)}>Login</Link>
+              </li>
+              <li>
+                <Link to="/signup" onClick={() => setMenuOpen(false)}>Sign Up</Link>
+              </li>
+              <li>
+                <Link to="/guest" onClick={() => setMenuOpen(false)}>Guest</Link>
+              </li>
+            </>
+          )}
+        </ul>
+
+        {/* Search bar */}
+        <div className={`navbar-search ${menuOpen ? 'active' : ''}`}>
+          <input
+            type="text"
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search recipes..."
+          />
+        </div>
+
+        {/* Dark mode toggle */}
+        {setDarkMode && (
+          <button
+            className="dark-mode-toggle"
+            onClick={() => setDarkMode(!darkMode)}
+          >
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
         )}
-      </ul>
+      </div>
     </nav>
   );
 };
