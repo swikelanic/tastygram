@@ -1,3 +1,4 @@
+// src/App.tsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -10,8 +11,9 @@ import GuestPage from './pages/GuestPage';
 import MyRecipesPage from './pages/MyRecipesPage';
 import UploadPage from './pages/UploadPage';
 import { Recipe, User } from './types';
+import { API_BASE_URL } from './api';
 
-// Import all recipe images
+// Import recipe images
 import carbonara from './assets/carbonara.jpg';
 import butterChicken from './assets/Butter-Chicken.jpg';
 import foods from './assets/foods.jpg';
@@ -308,12 +310,22 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [darkMode, setDarkMode] = useState(false);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
 
-  // Merge hardcoded recipes with uploaded recipes from localStorage
+  // Fetch recipes from backend and merge with hardcoded ones
   useEffect(() => {
-    const uploadedRecipes: Recipe[] = JSON.parse(localStorage.getItem('uploaded_recipes') || '[]');
-    setRecipes([...initialRecipes, ...uploadedRecipes]);
+    const fetchRecipes = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/recipes`);
+        if (!res.ok) throw new Error('Failed to fetch recipes');
+        const data: Recipe[] = await res.json();
+        setRecipes([...initialRecipes, ...data]);
+      } catch (err) {
+        console.error('Error fetching recipes from backend:', err);
+      }
+    };
+
+    fetchRecipes();
   }, []);
 
   return (
@@ -341,11 +353,11 @@ const App: React.FC = () => {
         />
         <Route
           path="/upload"
-          element={<UploadPage user={user} recipes={recipes} setRecipes={setRecipes} darkMode={darkMode} />}
+          element={<UploadPage user={user} darkMode={darkMode} />}
         />
         <Route
           path="/my-recipes"
-          element={<MyRecipesPage user={user} recipes={recipes} setRecipes={setRecipes} darkMode={darkMode} />}
+          element={<MyRecipesPage user={user} darkMode={darkMode} />}
         />
       </Routes>
     </Router>

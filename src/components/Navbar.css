@@ -9,8 +9,10 @@
   color: #bfa34a; /* gold text */
   font-family: 'Segoe UI', sans-serif;
   transition: background-color 0.3s, color 0.3s;
+  position: relative;
 }
 
+/* Logo */
 .navbar-logo a {
   color: #bfa34a;
   font-size: 1.8rem;
@@ -18,6 +20,7 @@
   text-decoration: none;
 }
 
+/* Links */
 .navbar-links {
   list-style: none;
   display: flex;
@@ -33,6 +36,12 @@
 
 .navbar-links li a:hover {
   color: #bfa34a; /* gold hover */
+}
+
+/* Search */
+.navbar-search {
+  display: flex;
+  align-items: center;
 }
 
 .navbar-search input {
@@ -106,4 +115,65 @@
 
 .dark-mode-toggle:hover {
   background-color: #d4b65a;
+}
+
+/* 🔹 RESPONSIVE STYLES */
+
+/* Mobile menu: hide links by default */
+.navbar-links,
+.navbar-search {
+  display: flex;
+  align-items: center;
+}
+
+/* Hamburger button */
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 4px;
+}
+
+.navbar-toggle span {
+  width: 25px;
+  height: 3px;
+  background-color: #bfa34a;
+  transition: all 0.3s;
+}
+
+.navbar.dark-mode .navbar-toggle span {
+  background-color: #f5d27a;
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 0.8rem 1rem;
+  }
+
+  /* Show hamburger menu */
+  .navbar-toggle {
+    display: flex;
+  }
+
+  /* Hide links/search by default on mobile */
+  .navbar-links,
+  .navbar-search {
+    flex-basis: 100%;
+    display: none;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  /* Show menu when active */
+  .navbar-links.active,
+  .navbar-search.active {
+    display: flex;
+  }
+
+  .navbar-links li {
+    text-align: center;
+  }
 }
