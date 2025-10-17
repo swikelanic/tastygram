@@ -4,21 +4,24 @@ import LoginForm from '../components/LoginForm';
 import { User } from '../types';
 
 interface LoginPageProps {
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  darkMode?: boolean; // <-- optional to be safe
+  darkMode?: boolean; // optional dark mode
+  setUser?: React.Dispatch<React.SetStateAction<User | null>>; // optional, for App-level user state
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ setUser, darkMode = false }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ darkMode = false, setUser }) => {
   return (
     <div
-      className={`max-w-md mx-auto mt-10 p-6 border rounded shadow ${
-        darkMode
-          ? 'border-gray-600 bg-gray-800 text-white'
-          : 'border-gray-300 bg-white text-black'
-      }`}
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '80vh',
+        background: darkMode
+          ? 'linear-gradient(135deg, #1f2937, #111827)'
+          : 'linear-gradient(135deg, #fefefe, #e0e0e0)',
+      }}
     >
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      <LoginForm setUser={setUser} darkMode={darkMode} />
+      <LoginForm darkMode={darkMode} setUser={setUser} />
     </div>
   );
 };

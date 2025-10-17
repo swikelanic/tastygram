@@ -1,22 +1,28 @@
 // src/context/RecipeContext.tsx
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Recipe, User } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface RecipeContextType {
   user: User | null;
-  login: (username: string) => void;
-  signup: (username: string) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // <-- added
+  login: (username: string, password: string) => boolean;
+  signup: (username: string, password: string) => void;
   logout: () => void;
   recipes: Recipe[];
   addRecipe: (recipe: Recipe) => void;
+}
+
+// Extend User type locally to include password for demo purposes
+interface UserWithPassword extends User {
+  password: string;
 }
 
 const RecipeContext = createContext<RecipeContextType | undefined>(undefined);
 
 export const RecipeProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [registeredUsers, setRegisteredUsers] = useState<UserWithPassword[]>([]);
 
   const [recipes, setRecipes] = useState<Recipe[]>([
     {
@@ -41,22 +47,33 @@ export const RecipeProvider = ({ children }: { children: ReactNode }) => {
     },
   ]);
 
-  // Login existing user
-  const login = (username: string) => {
-    const existingUser: User = {
+  // Signup new user
+  const signup = (username: string, password: string) => {
+    const existing = registeredUsers.find((u) => u.username === username);
+    if (existing) {
+      alert('Username already exists');
+      return;
+    }
+
+    const newUser: UserWithPassword = {
       id: uuidv4(),
       username,
+      password,
     };
-    setUser(existingUser);
+    setRegisteredUsers((prev) => [...prev, newUser]);
+    setUser(newUser);
   };
 
-  // Signup new user
-  const signup = (username: string) => {
-    const newUser: User = {
-      id: uuidv4(),
-      username,
-    };
-    setUser(newUser);
+  // Login existing user
+  const login = (username: string, password: string) => {
+    const existingUser = registeredUsers.find(
+      (u) => u.username === username && u.password === password
+    );
+    if (existingUser) {
+      setUser(existingUser);
+      return true;
+    }
+    return false;
   };
 
   // Logout user
@@ -79,7 +96,7 @@ export const RecipeProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <RecipeContext.Provider
-      value={{ user, login, signup, logout, recipes, addRecipe }}
+      value={{ user, setUser, login, signup, logout, recipes, addRecipe }}
     >
       {children}
     </RecipeContext.Provider>

@@ -1,47 +1,52 @@
+// src/components/Navbar.tsx
 import '../components/Navbar.css';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from '../types';
 
 interface NavbarProps {
-  onSearch: React.Dispatch<React.SetStateAction<string>>;
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  darkMode?: boolean; // optional prop
-  setDarkMode?: React.Dispatch<React.SetStateAction<boolean>>; // optional toggle
+  onSearch: (query: string) => void; // required
+  user: User | null;                 // required
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // required
+  darkMode?: boolean;                // optional, default false
+  setDarkMode?: React.Dispatch<React.SetStateAction<boolean>>; // optional
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser, darkMode = false, setDarkMode }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  onSearch,
+  user,
+  setUser,
+  darkMode = false,
+  setDarkMode,
+}) => {
   const [search, setSearch] = useState('');
-  const [menuOpen, setMenuOpen] = useState(false); // mobile menu state
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    onSearch(e.target.value);
+    const value = e.target.value;
+    setSearch(value);
+    onSearch(value);
   };
 
   const handleLogout = () => {
     setUser(null);
     navigate('/');
-    setMenuOpen(false); // close menu on logout
+    setMenuOpen(false);
   };
 
   return (
     <nav className={`navbar ${darkMode ? 'dark-mode' : ''}`}>
-      {/* Logo */}
-      <div className="navbar-logo">
-        <a onClick={() => { navigate('/'); setMenuOpen(false); }}>TastyGram</a>
+      <div className="navbar-logo" onClick={() => { navigate('/'); setMenuOpen(false); }}>
+        TastyGram
       </div>
 
-      {/* Hamburger toggle for mobile */}
       <div className="navbar-toggle" onClick={() => setMenuOpen(!menuOpen)}>
         <span></span>
         <span></span>
         <span></span>
       </div>
 
-      {/* Menu links + search */}
       <div className={`navbar-menu ${menuOpen ? 'active' : ''}`}>
         <ul className={`navbar-links ${menuOpen ? 'active' : ''}`}>
           <li>
@@ -76,7 +81,6 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser, darkMode = fal
           )}
         </ul>
 
-        {/* Search bar */}
         <div className={`navbar-search ${menuOpen ? 'active' : ''}`}>
           <input
             type="text"
@@ -86,11 +90,10 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, user, setUser, darkMode = fal
           />
         </div>
 
-        {/* Dark mode toggle */}
         {setDarkMode && (
           <button
             className="dark-mode-toggle"
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={() => setDarkMode(prev => !prev)}
           >
             {darkMode ? '☀️ Light' : '🌙 Dark'}
           </button>

@@ -19,9 +19,10 @@ export interface Recipe {
   reviews?: Review[];
 }
 
-// Add this interface
+// Updated User interface
 export interface User {
   id: string;
   username: string;
   email?: string;
+  password?: string; // Added for login/signup
 }

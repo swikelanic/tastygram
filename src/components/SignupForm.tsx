@@ -1,13 +1,21 @@
+// src/components/SignupForm.tsx
 import React, { useState } from 'react';
 import { useRecipeContext } from '../context/RecipeContext';
+import { User } from '../types';
 
-const SignupForm: React.FC = () => {
+interface SignupFormProps {
+  darkMode?: boolean;
+  setUser?: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+const SignupForm: React.FC<SignupFormProps> = ({ darkMode = false, setUser }) => {
   const [username, setUsername] = useState('');
-  const { signup, user, logout } = useRecipeContext();
+  const [password, setPassword] = useState('');
+  const { signup, user, logout, setUser: contextSetUser } = useRecipeContext();
 
   if (user) {
     return (
-      <div style={styles.loggedInContainer}>
+      <div style={{ ...styles.loggedInContainer, backgroundColor: darkMode ? '#1f2937' : '#fff' }}>
         <p style={styles.welcomeText}>Welcome, {user.username}!</p>
         <button onClick={logout} style={styles.logoutButton}>
           Logout
@@ -19,88 +27,124 @@ const SignupForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedUsername = username.trim();
-    if (trimmedUsername) {
-      signup(trimmedUsername);
-      setUsername('');
+    const trimmedPassword = password.trim();
+    if (!trimmedUsername || !trimmedPassword) {
+      alert('Please enter both username and password.');
+      return;
     }
+
+    signup(trimmedUsername, trimmedPassword);
+
+    // Update user state via prop or context
+    const updateUser = setUser || contextSetUser;
+    updateUser({ id: trimmedUsername, username: trimmedUsername });
+
+    setUsername('');
+    setPassword('');
   };
 
   return (
-    <form onSubmit={handleSubmit} style={styles.form}>
-      <h2 style={styles.heading}>Sign Up</h2>
-      <input
-        type="text"
-        placeholder="Enter username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-        style={styles.input}
-      />
-      <button type="submit" style={styles.button}>
-        Sign Up
-      </button>
-    </form>
+    <div style={styles.wrapper}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          ...styles.card,
+          background: darkMode
+            ? 'linear-gradient(145deg, #2d3748, #1f2937)'
+            : 'linear-gradient(145deg, #fefefe, #e0e0e0)',
+          color: darkMode ? '#fff' : '#333',
+        }}
+      >
+        <h2 style={styles.heading}>Sign Up</h2>
+        <input
+          type="text"
+          placeholder="Enter username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={{
+            ...styles.input,
+            backgroundColor: darkMode ? '#374151' : '#fff',
+            color: darkMode ? '#fff' : '#000',
+          }}
+        />
+        <input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{
+            ...styles.input,
+            backgroundColor: darkMode ? '#374151' : '#fff',
+            color: darkMode ? '#fff' : '#000',
+          }}
+        />
+        <button type="submit" style={styles.button}>
+          Sign Up
+        </button>
+      </form>
+    </div>
   );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-  form: {
-    maxWidth: '300px',
-    margin: '2rem auto',
+  wrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '80vh',
+  },
+  card: {
+    width: '350px',
+    padding: '2rem',
+    borderRadius: '20px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-    textAlign: 'center',
-    padding: '1.5rem',
-    border: '1px solid #ccc',
-    borderRadius: '12px',
-    backgroundColor: '#fefefe',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    transition: 'transform 0.3s, box-shadow 0.3s',
   },
   heading: {
-    margin: 0,
-    fontSize: '1.5rem',
-    color: '#5a3e36',
+    textAlign: 'center',
+    fontSize: '1.8rem',
+    marginBottom: '1rem',
+    fontWeight: 'bold',
   },
   input: {
-    padding: '10px',
+    padding: '12px',
     fontSize: '1rem',
-    borderRadius: '6px',
+    borderRadius: '10px',
     border: '1px solid #ccc',
+    outline: 'none',
+    transition: 'all 0.3s',
   },
   button: {
-    padding: '10px',
+    padding: '12px',
     fontSize: '1.1rem',
-    backgroundColor: '#007BFF',
-    color: 'white',
+    fontWeight: 'bold',
+    background: '#FF6B6B',
+    color: '#fff',
     border: 'none',
+    borderRadius: '10px',
     cursor: 'pointer',
-    borderRadius: '6px',
-    transition: 'background-color 0.3s ease',
+    transition: 'all 0.3s',
   },
   loggedInContainer: {
-    maxWidth: '300px',
-    margin: '2rem auto',
-    padding: '1.5rem',
+    maxWidth: '350px',
+    margin: '5rem auto',
+    padding: '2rem',
     textAlign: 'center',
-    border: '1px solid #ccc',
-    borderRadius: '12px',
-    backgroundColor: '#fefefe',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    borderRadius: '20px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
   },
-  welcomeText: {
-    fontSize: '1.2rem',
-    marginBottom: '1rem',
-    color: '#5a3e36',
-  },
+  welcomeText: { fontSize: '1.2rem', marginBottom: '1rem' },
   logoutButton: {
-    padding: '10px',
+    padding: '12px',
     fontSize: '1rem',
     backgroundColor: '#FF4D4D',
     color: 'white',
     border: 'none',
+    borderRadius: '10px',
     cursor: 'pointer',
-    borderRadius: '6px',
   },
 };
 
